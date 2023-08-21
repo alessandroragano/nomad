@@ -1,0 +1,64 @@
+# ****** EXPERIMENT PARAMETERS *******
+# Feature choice
+experiment_name: "Training"
+out_dir: "train_triplet"
+training_script: "src.training.train_triplet"
+
+# Path to csv file and root dir (relative to main file)
+#root: "/media/alergn/hdd/datasets/audio/speech/MS-SNSD/"
+#train_df: "data/MS_triplets_train_semihard.csv"
+#valid_df: "data/MS_triplets_valid_semihard.csv"
+root: "/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg/"
+#train_df: "data/LS_triplet_train_incremental2.csv"
+#valid_df: "data/LS_triplet_valid_incremental2.csv"
+train_df: "data/LS_triplet_train_newt.csv"
+valid_df: "data/LS_triplet_valid_newt.csv"
+
+# Feature parameters
+sampling_rate: 16000
+
+# Hyper parameter
+train_bs: 2
+val_bs: 2
+test_bs: 1
+lr: 0.0001
+lr_decay_factor: 0.99
+lr_decay_step: 30
+num_epochs: 50
+num_workers: 6
+
+# Early stopping
+patience: 1
+ 
+# wav2vec pretrained model path
+checkpoint_path: "/media/alergn/hdd/github/dcec-tcd-voip/models/voiceMOS/Wav2VecSmall/wav2vec_small.pt"
+ssl_out_dim: 768
+emb_dim: 256
+margin: 1
+
+# Choose feature extraction or partial finetuning
+freeze_convnet: True
+freeze_all: False
+
+# Choose which model to train
+architecture: 'w2v'
+eval_w2v: False
+
+# Level db
+# current_level: 
+#   - 1
+#   - 2
+#   - 5
+current_level: null
+
+# Load previous best path
+path_level_1: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/25-06-2023_12-31-04/1_best_model.pt
+
+# Spectrogram parameters
+n_mels: 48
+n_fft: 400
+win_length: 400
+hop_length: 200
+patch_length: 16
+max_length: 20
+trim: False

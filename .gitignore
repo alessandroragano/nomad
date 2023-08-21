@@ -1,0 +1,6 @@
+data/
+out_models/
+*.pyc
+*.out
+*.sh
+*.th

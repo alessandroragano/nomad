@@ -1,0 +1,120 @@
+# ****** EXPERIMENT PARAMETERS *******
+# Feature choice
+experiment_name: "Eval Triplet"
+out_dir: "./experiments/triplet"
+training_script: "src.training.train_triplet"
+
+# Path to csv file and root dir (relative to main file)
+# root: "/media/alergn/hdd/datasets/audio/speech/MS-SNSD/"
+# train_df: "data/MS_triplets_train_semihard.csv"
+# valid_df: "data/MS_triplets_valid_semihard.csv"
+root: "/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg/"
+train_df: "data/LS_triplet_train_incremental2.csv"
+valid_df: "data/LS_triplet_valid.csv"
+
+# Feature parameters
+sampling_rate: 16000
+
+# Hyper parameter
+train_bs: 1
+val_bs: 1
+test_bs: 1
+lr: 0.0001
+lr_decay_factor: 0.5
+lr_decay_step: 10
+num_epochs: 1000
+num_workers: 6
+
+# Early stopping
+patience: 20
+
+# wav2vec pretrained model path
+#checkpoint_path: "/media/alergn/hdd/github/dcec-tcd-voip/models/voiceMOS/Wav2VecSmall/wav2vec_small.pt"
+checkpoint_path: "/media/alergn/hdd/w2v_model/wav2vec_small.pt"
+
+#rank_model_path: "/media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/16-06-2023_09-39-59/best_model.pt"
+#rank_model_path: "/media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/23-06-2023_10-21-00/best_model.pt"
+
+# OLD MODEL THAT HAS BEEN FINETUNED TWICE (BEST MODEL SO FAR)
+#rank_model_path : /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/29-05-2023_12-10-30/best_model.pt
+
+# W2V FROZEN FEATURE EXTRACTION (1, 2, 5)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/02-07-2023_23-23-37/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1, 2, 5)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/02-07-2023_15-24-13/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/03-07-2023_10-58-41/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1 -> 2)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/03-07-2023_21-43-01/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1 -> 2 -> 3,5)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/05-07-2023_13-07-49/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1,2.3,5)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/05-07-2023_13-30-14/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1,2)
+rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/09-07-2023_10-41-22/best_model.pt
+
+# W2V FINETUNE TRANSFORMER (1,2) LARGE
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/10-07-2023_15-24-29/best_model.pt 
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/15-07-2023_15-31-00/best_model.pt 
+
+# W2V FINETUNE TRANSFORMER (0.0002 THRESHOLD)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/10-08-2023_16-30-22/best_model.pt
+
+# SPECTROGRAM MODEL (1, 2, 5)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/02-07-2023_15-18-38/best_model.pt
+
+# SPECTROGRAM MODEL (1)
+#rank_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/04-07-2023_09-15-19/best_model.pt
+
+ssl_out_dim: 768
+
+# Quality embedding triplet loss 
+emb_dim: 256
+margin: 0.2
+
+# Evaluation embedding parameters
+non_match_dir: /media/alergn/hdd/datasets/audio/speech/TSP_speech_subset/train/ref
+test_db_file: ./data/test_data2.csv
+test_db_file_fr: ./data/test_data_fr2.csv
+db: null
+conds: null
+test_db_wav: /media/alergn/hdd/datasets/audio/speech/
+csv_clean: '/media/alergn/hdd/github/speech-degradator/degraded_data_visqol_scores_snap.csv'
+pretrain: False 
+
+# Evaluation monotonocity rank
+test_mono_data: 'data/test_set_mono_new.csv'
+test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDegTestRefUnique'
+
+# Evaluate MOS predictor embeddings (instead of triplet loss embeddings)
+eval_mos_pred: False
+mos_pred_model: ./out_models/train_mos/30-05-2023_12-38-53/best_model.pt
+architecture: 'w2v'
+
+# Eval orig w2v
+eval_w2v: False
+
+# Evaluate embeddings on cross reference data
+cross_ref_db: 'data/LS_triplet_valid_easy_crossref.csv'
+cross_ref_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg'
+
+current_level: 
+  - 1
+  - 2
+#   - 5
+#current_level: null
+
+# Spectrogram parameters
+n_mels: 48
+n_fft: 400
+win_length: 400
+hop_length: 200
+patch_length: 16
+max_length: 20
+trim: False
