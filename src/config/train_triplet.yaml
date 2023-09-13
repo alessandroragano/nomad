@@ -26,6 +26,7 @@ lr_decay_factor: 0.99
 lr_decay_step: 30
 num_epochs: 50
 num_workers: 6
+emb_dim: 256
 
 # Early stopping
 patience: 1
@@ -33,8 +34,7 @@ patience: 1
 # wav2vec pretrained model path
 checkpoint_path: "/media/alergn/hdd/github/dcec-tcd-voip/models/voiceMOS/Wav2VecSmall/wav2vec_small.pt"
 ssl_out_dim: 768
-emb_dim: 256
-margin: 1
+margin: 0.2
 
 # Choose feature extraction or partial finetuning
 freeze_convnet: True
@@ -42,17 +42,14 @@ freeze_all: False
 
 # Choose which model to train
 architecture: 'w2v'
+
+# Set this to true if you want to evaluate original w2v features
 eval_w2v: False
 
-# Level db
-# current_level: 
-#   - 1
-#   - 2
-#   - 5
-current_level: null
-
-# Load previous best path
-path_level_1: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/25-06-2023_12-31-04/1_best_model.pt
+# Level db ### 1 EASY Sampling, ### 2 HARD Sampling, ### 1,2 both
+current_level: 
+  - 1
+  - 2
 
 # Spectrogram parameters
 n_mels: 48
