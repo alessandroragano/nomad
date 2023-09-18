@@ -2,25 +2,26 @@ import yaml
 import os
 import subprocess
 from degradations import mp3, opus, noise, clip_signal
-import degradations
 import pandas as pd
 import random
 random.seed(0)
 
-with open('config.yaml') as file:
+with open('src/config/config_audio_degrader.yaml') as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
 
 sr = config['sr']
-in_dir = config['in_dir']
-out_dir = config['out_dir']
+in_dir = os.path.join(config['root'], config['in_dir_train'])
+in_dir_wav = os.path.join(config['root'], config['in_dir_train_wav'])
+out_dir = os.path.join(config['root'], config['out_dir_train'])
 
+# Specify the total number of conditions (5 degradations x 4 intensity levels )
 n_cond = 20
 
 filepath_deg, filename_deg, filepath_ref, filename_ref = [], [], [], []
 abs_filepath_deg, abs_filepath_ref = [], []
 for root, dirs, files in os.walk(in_dir):
     for filename in files:
-        if filename.endswith('.flac'):
+        if (filename.endswith('.flac') | (filename.endswith('.wav'))):  
             in_filepath = os.path.join(root, filename)
             filename = os.path.splitext(filename)[0] + '.wav'
             
@@ -31,19 +32,20 @@ for root, dirs, files in os.walk(in_dir):
             sub_dir = root.split('/')[-2:]
             sub_dir = '/'.join(sub_dir)
 
-            # Convert to wav for visqol
-            if not os.path.isdir(os.path.join(config['librispeech_wav'], sub_dir)):
-                os.makedirs(os.path.join(config['librispeech_wav'], sub_dir))
+            # Make subdirs
+            if not os.path.isdir(os.path.join(in_dir_wav, sub_dir)):
+                os.makedirs(os.path.join(in_dir_wav, sub_dir))
+            in_filepath_wav = os.path.join(in_dir_wav, sub_dir, filename)
             
-            in_filepath_wav = os.path.join(config['librispeech_wav'], sub_dir, filename)
-            wav_convert = f'ffmpeg -y -i {in_filepath} -ar {sr} {in_filepath_wav}'.split(' ')
-            subprocess.call(wav_convert)
+            # Convert to wav for visqol
+            if not in_filepath.endswith('.wav'):
+                wav_convert = f'ffmpeg -y -i {in_filepath} -ar {sr} {in_filepath_wav}'.split(' ')
+                subprocess.call(wav_convert)
 
             filepath_ref_relative = os.path.join(sub_dir, filename)
             filepath_ref += n_cond * [filepath_ref_relative]
 
             # Store absolute filepath ref
-            #abs_filepath_ref.append([in_filepath]*n_cond)
             abs_filepath_ref += n_cond * [in_filepath_wav]
 
             # *** MP3 ****
@@ -54,7 +56,7 @@ for root, dirs, files in os.walk(in_dir):
                 os.makedirs(out_dir_mp3)
             
             # Call mp3 codec for all conditions
-            for cond in config['mp3_params']:
+            for cond in config['mp3_train']:
                 # Build filename deg file
                 filename_deg_file = filename.split('.')[0] + f'_{subdir_name}_{cond}.wav'
                 filename_deg.append(filename_deg_file)
@@ -77,7 +79,7 @@ for root, dirs, files in os.walk(in_dir):
                 os.makedirs(out_dir_opus)
                     
             # Call mp3 codec for all conditions
-            for cond in config['opus_params']:
+            for cond in config['opus_train']:
                 filename_deg_file = filename.split('.')[0] + f'_{subdir_name}_{cond}.wav'
                 filename_deg.append(filename_deg_file)
 
@@ -97,9 +99,10 @@ for root, dirs, files in os.walk(in_dir):
                 os.makedirs(out_dir_noise)
                 
             # Pick one noise file
-            list_noise_files = [nx for nx in os.listdir(config['noise_dir']) if nx.endswith('.wav')]
-            noise_path = os.path.join(config['noise_dir'], random.choice(list_noise_files))
-            for cond in config['noise_params']:
+            noise_dir = os.path.join(config['root_noise'], config['noise_dir_train'])
+            list_noise_files = [nx for nx in os.listdir(noise_dir) if nx.endswith('.wav')]
+            noise_path = os.path.join(noise_dir, random.choice(list_noise_files))
+            for cond in config['noise_train']:
                 str_cond = str(cond)
                 filename_deg_file = filename.split('.')[0] + f'_{subdir_name}_{str_cond}.wav'
                 filename_deg.append(filename_deg_file)
@@ -120,7 +123,7 @@ for root, dirs, files in os.walk(in_dir):
                 os.makedirs(out_dir_clip)
             
             # Clip
-            for cond in config['clip_params']:
+            for cond in config['clip_train']:
                 str_cond = str(cond)
                 filename_deg_file = filename.split('.')[0] + f'_{subdir_name}_{str_cond}.wav'
                 filename_deg.append(filename_deg_file)
@@ -133,8 +136,10 @@ for root, dirs, files in os.walk(in_dir):
                 cmd_normalization = f'ffmpeg-normalize {out_filepath} -o {out_filepath} -f -ar {16000}'.split(' ')
                 subprocess.call(cmd_normalization)
 
-
+# Store data
 df = pd.DataFrame({'filename_ref': filename_ref, 'filepath_ref': filepath_ref, 'filename_deg': filename_deg, 'filepath_deg': filepath_deg})
 df.to_csv('degraded_data.csv', index=False)
+
+# Store data for ViSQOL
 df_visqol = pd.DataFrame({'filepath_ref': abs_filepath_ref, 'filepath_deg': abs_filepath_deg})
 df_visqol.to_csv('degraded_data_visqol_format.csv', index=False)

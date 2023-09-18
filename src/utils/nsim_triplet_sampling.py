@@ -7,6 +7,8 @@ from pathlib import Path
 import os
 
 # Set seed
+# Seed is used for the split but not for sampling positive and negative whereas the global seed has been used
+# You find the csv in the repo if you want to reuse the same train/valid sets. Otherwise specify the random_state in the sample function.
 SEED = 10
 random.seed(SEED)
 
@@ -26,9 +28,8 @@ train_inds, test_inds = next(split)
 train_df = df.iloc[train_inds]
 val_df = df.iloc[test_inds]
 
-
 def create_triplets(df, N=1, hard_sampling=True):
-    margin = 0.002
+    margin = 0.05
     df.drop_duplicates(inplace=True)
     anchor_list, positive_list, negative_list = [], [], []
     positive_nsim, negative_nsim = [], []
@@ -79,12 +80,14 @@ def create_triplets(df, N=1, hard_sampling=True):
     df_out = pd.DataFrame({'Anchor': anchor_list, 'Positive': positive_list, 'Negative': negative_list, 'anc_pos_dist': positive_dist, 'anc_neg_dist': negative_dist})
     return df_out
 
-# Call for trainset
-train_triplets_df = create_triplets(train_df, N=1, hard_sampling=False)
+# Create datasets (Easy)
+train_triplets_df = create_triplets(train_df, N=3, hard_sampling=False)
 train_triplets_df.dropna(axis=0, inplace=True)
-valid_triplets_df = create_triplets(val_df, N=1, hard_sampling=False)
+valid_triplets_df = create_triplets(val_df, N=3, hard_sampling=False)
 valid_triplets_df.dropna(axis=0, inplace=True)
 
-train_triplets_df.to_csv('data/LS_triplet_train_newt.csv')
-valid_triplets_df.to_csv('data/LS_triplet_valid_newt.csv')
-pass
+# Create datasets (Hard)
+train_triplets_df = create_triplets(train_df, N=3, hard_sampling=True)
+train_triplets_df.dropna(axis=0, inplace=True)
+valid_triplets_df = create_triplets(val_df, N=3, hard_sampling=True)
+valid_triplets_df.dropna(axis=0, inplace=True)

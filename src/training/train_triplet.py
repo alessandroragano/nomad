@@ -3,7 +3,7 @@ import torch.nn as nn
 import fairseq
 import yaml
 from src.dataloader.triplet_dataloader import TripletDataset, load_processing
-from src.models.networks import TripletModel, MyModel, Origw2v, SQUAD, SQUAD2, TripletModel2, SpecgramModel
+from src.models.networks import TripletModel, Origw2v, SpecgramModel
 from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
@@ -14,10 +14,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import random
 from scipy.stats import spearmanr, pearsonr
-from sklearn.metrics import mean_squared_error
-import math
 from scipy.optimize import curve_fit
-from scipy.spatial.distance import cosine
 import torch.optim.lr_scheduler as lr_scheduler
 import torchaudio
 from scipy.spatial.distance import cdist
@@ -254,10 +251,6 @@ class Training():
         
         return df_emb
 
-    def euclidean_dist(self, embeddings, anc_emb_arr):
-        dist = np.sqrt(np.dot(embeddings - anc_emb_arr, (embeddings - anc_emb_arr).T))
-        return dist
-
     def order_three(self, x, a, b, c, d):
         return a*x + b*x**2 + c*x**3 + d
 
@@ -293,9 +286,9 @@ class Training():
             print(db_name)
 
             # Get test embeddings
-            df_emb = self.get_embeddings_csv(self.model, db['filepath'], root=self.config['test_root_wav'])
-            test_embeddings = df_emb.set_index('filepath')
-            test_names = df_emb.merge(db, on='filepath')[['filepath', 'condition', 'mos']]         
+            df_emb = self.get_embeddings_csv(self.model, db['filepath_deg'], root=self.config['test_root_wav'])
+            test_embeddings = df_emb.set_index('filepath_deg')
+            test_names = df_emb.merge(db, on='filepath_deg')[['filepath_deg', 'condition', 'mos']]         
             
             # Calculate distance of each pair then take the average over all the non-matching references for each test audio
             euclid_dist = cdist(test_embeddings, ref_embeddings)
@@ -303,8 +296,8 @@ class Training():
             names = test_embeddings.index
 
             # Add distances 
-            df_dist = pd.DataFrame({'filepath': names, 'Distance': avg_dist_nmr})
-            df_dist = df_dist.merge(test_names, on='filepath')
+            df_dist = pd.DataFrame({'filepath_deg': names, 'Distance': avg_dist_nmr})
+            df_dist = df_dist.merge(test_names, on='filepath_deg')
             df_dist = df_dist.groupby('condition').mean()
 
             # Compute third order poly mapping (performance in the paper are reported without mapping)
@@ -433,9 +426,9 @@ class Training():
         
         for db_name, db in db_groups:
             print(db_name)
-            df_emb_ref = self.get_embeddings_csv(self.model, db['Filepath Ref']).set_index('Filepath Ref')
-            df_emb_test = self.get_embeddings_csv(self.model, db['Filepath Deg']).set_index('Filepath Deg')
-            test_names = df_emb_test.merge(db, on='Filepath Deg')[['Filepath Deg', 'Condition', 'MOS']]   
+            df_emb_ref = self.get_embeddings_csv(self.model, db['filepath_ref'], root=self.config['test_root_wav']).set_index('filepath_ref')
+            df_emb_test = self.get_embeddings_csv(self.model, db['filepath_deg'], root=self.config['test_root_wav']).set_index('filepath_deg')
+            test_names = df_emb_test.merge(db, on='filepath_deg')[['filepath_deg', 'condition', 'mos']]   
             
             # Eucl distance only with matching reference (take diagonal)
             euclid_dist = cdist(df_emb_test, df_emb_ref)
@@ -443,18 +436,18 @@ class Training():
             names = df_emb_test.index
 
             # # Add distances 
-            df_dist = pd.DataFrame({'Filepath Deg': names, 'Distance': fr_distance})
-            df_dist = df_dist.merge(test_names, on='Filepath Deg')
-            df_dist = df_dist.groupby('Condition').mean()
+            df_dist = pd.DataFrame({'filepath_deg': names, 'Distance': fr_distance})
+            df_dist = df_dist.merge(test_names, on='filepath_deg')
+            df_dist = df_dist.groupby('condition').mean()
 
             # Compute third order poly mapping (paper results are reported without mapping)
             #df_grouped = df_dist.groupby('condition')['mos', 'Distance'].mean()
-            popt3, _ = curve_fit(self.order_three, df_dist['Distance'].values, df_dist['MOS'].values)
+            popt3, _ = curve_fit(self.order_three, df_dist['Distance'].values, df_dist['mos'].values)
             a3, b3, c3, d3 = popt3
             df_dist['Distance_map'] = df_dist['Distance'].apply(lambda x: self.order_three(x,a3,b3,c3,d3))
 
             # Scatter plot MOS - Embedding Distances
-            sns.scatterplot(data=df_dist, x='MOS', y='Distance_map')
+            sns.scatterplot(data=df_dist, x='mos', y='Distance_map')
             plt.xlabel('Actual MOS')
             plt.ylabel(f'Dist w.r.t Reference')
             plt.xlim([1, 5])
@@ -465,15 +458,15 @@ class Training():
             plt.close()
             
             # Performance Evaluation Spearman
-            SRCC, _ = spearmanr(df_dist['Distance'], df_dist['MOS'])
+            SRCC, _ = spearmanr(df_dist['Distance'], df_dist['mos'])
             print(f'SRCC: {np.round(SRCC, 2)}')
-            SRCC, _ = spearmanr(df_dist['Distance_map'], df_dist['MOS'])
+            SRCC, _ = spearmanr(df_dist['Distance_map'], df_dist['mos'])
             print(f'SRCC 3rd map: {np.round(SRCC, 2)}')
 
             # Performance Evaluation Pearson
-            PCC, _ = pearsonr(df_dist['Distance'], df_dist['MOS'])
+            PCC, _ = pearsonr(df_dist['Distance'], df_dist['mos'])
             print(f'PCC: {np.round(PCC, 2)}')
-            PCC, _ = pearsonr(df_dist['Distance_map'], df_dist['MOS'])
+            PCC, _ = pearsonr(df_dist['Distance_map'], df_dist['mos'])
             print(f'PCC 3rd map: {np.round(PCC, 2)}')
     
     def get_nmr_embeddings(self):
@@ -484,5 +477,9 @@ class Training():
         
         # Calculate embeddings
         ref_embeddings = self.get_embeddings_csv(self.model, ref_files)
-        
         return ref_embeddings
+    
+    # Use this function to check if cdist gives the same result
+    def euclidean_dist(self, emb_a, emb_b):
+        dist = np.sqrt(np.dot(emb_a - emb_b, (emb_a - emb_b).T))
+        return dist

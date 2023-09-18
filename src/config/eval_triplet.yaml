@@ -28,8 +28,8 @@ margin: 0.2
 
 # Evaluation embedding parameters
 non_match_dir: /media/alergn/hdd/datasets/audio/speech/TSP_speech_subset/train/ref
-test_db_file: ./data/test_data.csv
-test_db_file_fr: ./data/test_data_fr.csv
+test_db_file: ./data/test_quality_nogs.csv
+test_db_file_fr: ./data/test_quality_nogs.csv
 db: null
 conds: null
 test_root_wav: /media/alergn/hdd/datasets/audio/speech/
@@ -37,8 +37,10 @@ csv_clean: '/media/alergn/hdd/github/speech-degradator/degraded_data_visqol_scor
 pretrain: False 
 
 # Evaluation monotonocity rank
-test_mono_data: 'data/test_set_mono_new.csv'
-test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDegTestRefUnique'
+#test_mono_data: 'data/test_degradation_intensity.csv'
+#test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDegTestRefUnique'
+test_mono_data: 'data/test_degradation_intensity_new.csv'
+test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeech/test-clean-degraded-dummy'
 
 # Evaluate MOS predictor embeddings (instead of triplet loss embeddings)
 eval_mos_pred: False
@@ -55,7 +57,6 @@ cross_ref_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg'
 current_level: 
   - 1
   - 2
-#   - 5
 #current_level: null
 
 # Spectrogram parameters

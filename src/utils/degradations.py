@@ -38,8 +38,8 @@ def noise(clean_path, noise_path, out_filepath, snr_db=0, sr=16000):
     if x_len > s_len:
         # Calculate how many times we need to repeat the signal and round up to the nearest integer
         reps = math.ceil(x_len/s_len)
-        # Use the function np.tile to repeat an array
 
+        # Use the function np.tile to repeat an array
         s = np.tile(s, reps)
 
     # Truncate the background signal  
@@ -60,6 +60,7 @@ def noise(clean_path, noise_path, out_filepath, snr_db=0, sr=16000):
 
     # Scale factor noise signal
     alpha = sp_target/sp
+
     # Sum speech and background noise
     y = x + alpha*s
 
@@ -83,9 +84,6 @@ def clip_signal(in_filepath, out_filepath, clip_factor='10', sr=16000):
 
 # UNSEEN degradations
 def vorbis(in_filepath, out_filepath, quality='3', sr=16000):
-    # wave, _ = torchaudio.load(in_filepath)
-    # d_wave = torchaudio.functional.apply_codec(wave, sr, format='vorbis', compression=quality)
-    # sf.write(out_filepath, data=d_wave, samplerate=sr)
     # Compress vorbis
     vorbis_outpath = os.path.splitext(out_filepath)[0] + '.ogg'
     cmd = f'ffmpeg -y -i {in_filepath} -c:a libvorbis -qscale:a {quality} {vorbis_outpath}'.split(' ')
