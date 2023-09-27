@@ -1,7 +1,7 @@
 # ****** EXPERIMENT PARAMETERS *******
 # Feature choice
 experiment_name: "Training"
-out_dir: "train_triplet"
+out_dir: "train-triplet"
 training_script: "src.training.train_triplet"
 
 # Path to csv file and root dir (relative to main file)

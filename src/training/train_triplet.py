@@ -150,7 +150,7 @@ class Training():
         # Start Training Loop
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
-        self.PATH_DIR = os.path.join('out_models', self.config['out_dir'], dt_string)
+        self.PATH_DIR = os.path.join('out-models', self.config['out_dir'], dt_string)
         if not os.path.isdir(self.PATH_DIR):
             os.makedirs(self.PATH_DIR)
 

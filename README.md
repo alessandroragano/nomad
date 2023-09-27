@@ -4,18 +4,33 @@ NOMAD is a differentiable perceptual similarity metric that measures the distanc
 The proposed method is based on learning deep feature embeddings via a triplet loss guided by the Neurogram Similarity Index Measure (NSIM) to capture degradation intensity. During inference, the similarity score between any two audio samples is computed through Euclidean distance of their embedding.
 NOMAD can be also used as a loss function to improve speech enhancement models.
 
+## Table of contents
+- [Non-Matching Audio Distance (NOMAD)](#non-matching-audio-distance--nomad-)
+  * [Installation](#installation)
+  * [Using NOMAD similarity score](#using-nomad-similarity-score)
+    + [Using NOMAD from the command line](#using-nomad-from-the-command-line)
+    + [Using NOMAD inside Python](#using-nomad-inside-python)
+  * [Using NOMAD loss function](#using-nomad-loss-function)
+    + [NOMAD loss weighting](#nomad-loss-weighting)
+  * [Training](#training)
+    + [Package dependencies](#package-dependencies)
+    + [Dataset generation](#dataset-generation)
+    + [Training the model](#training-the-model)
+  * [Performance](#performance)
+  * [Paper and license](#paper-and-license)
+
 ## Installation
 NOMAD is hosted on PyPi. It can be installed in your Python environment with the following command
 ```
 pip install nomad_audio
 ```
 
-## Using NOMAD Similarity Score
+## Using NOMAD similarity score
 ### Using NOMAD from the command line
 NOMAD similarity score can be used to measure perceptual similarity between any two signals. NOMAD can be used with unpaired speech i.e., any clean speech can serve as a reference. You can use NOMAD from the command line as follows:  
 
 ```
-python -m nomad_audio --nmr_path /path/to/dir/references --test_path /path/to/dir/degraded
+python -m nomad_audio --nmr_path /path/to/dir/non-matching-references --test_path /path/to/dir/degraded
 ```
 
 The script creates two csv files in ```results-csv``` with date time format. 
@@ -94,7 +109,26 @@ The following steps are required to train the model:
 python main.py --config_file train_triplet.yaml
 ``` 
 
-This will generate a path in your working directory ```out_models/train_triplet/dd-mm-yyyy_hh-mm-ss``` that includes the best model and the configuration parameters used to train this model.
+This will generate a path in your working directory ```out-models/train-triplet/dd-mm-yyyy_hh-mm-ss``` that includes the best model and the configuration parameters used to train this model.
+
+
+## Performance
+We evaluated NOMAD for ranking degradation intensity, speech quality assessment, and as a loss function for speech enhancement.
+See the paper for more details. 
+As clean non-matching references, we extracted 899 samples from the [TSP](https://www.mmsp.ece.mcgill.ca/Documents/Data/) speech database.
+
+Here we show the scatter plot between NOMAD scores and MOS quality labels. For each database we mapped NOMAD scores to MOS using a third order polynomial. 
+Notice that performances are reported without mapping in the paper.
+
+#### [Genspeech](https://arxiv.org/abs/2102.10449)
+![Screenshot](figs/Genspeech_embeddings.png)
+
+#### [P23 EXP1](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
+![Screenshot](figs/P23_EXP1_embeddings.png)
+
+#### [P23 EXP3](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
+![Screenshot](figs/P23_EXP3_embeddings.png)
+
 
 ## Paper and license
 Pre-print will be available soon.

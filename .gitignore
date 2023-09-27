@@ -1,7 +1,9 @@
+.vscode/
 data/*
 !data/train.csv
 !data/valid.csv
 out-models/
+out_models/
 pt-models/
 se-models/
 *.pyc
