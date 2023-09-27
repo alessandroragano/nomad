@@ -1,0 +1,18 @@
+noisy_train_dir: '/path/to/noisy_trainset_28spk_wav'
+clean_train_dir: '/path/to/clean_trainset_28spk_wav'
+noisy_valid_dir: '/path/to/noisy_validset_28spk_wav'
+clean_valid_dir: '/path/to/clean_validset_28spk_wav'
+noisy_test_dir: '/path/to/noisy_testset_wav'
+clean_test_dir: '/path/to/clean_testset_wav'
+
+train_bs: 32  
+valid_bs: 100
+test_bs: 100
+lr: 0.0001
+nomad_weight: 0.001
+num_workers: 8
+target_sr: 16000
+patience: 50
+num_epochs: 99
+
+test_every: 10

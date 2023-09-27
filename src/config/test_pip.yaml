@@ -1,0 +1,4 @@
+# ****** EXPERIMENT PARAMETERS *******
+# Feature choice
+experiment_name: "Test pip"
+training_script: "src.nomad_ar.nomad_score_test"

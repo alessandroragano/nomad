@@ -1,6 +1,6 @@
 # ****** EXPERIMENT PARAMETERS *******
 # Feature choice
-experiment_name: "intensity"
+experiment_name: "quality_nmr"
 out_dir: "./experiments/triplet"
 training_script: "src.training.train_triplet"
 
@@ -14,11 +14,10 @@ num_workers: 6
 patience: 20
 
 # wav2vec pretrained model path
-#checkpoint_path: "/media/alergn/hdd/github/dcec-tcd-voip/models/voiceMOS/Wav2VecSmall/wav2vec_small.pt"
-checkpoint_path: "/media/alergn/hdd/w2v_model/wav2vec_small.pt"
+checkpoint_path: ./pt-models/wav2vec_small.pt
 
 # W2V FINETUNE TRANSFORMER (1,2)
-nomad_model_path: /media/alergn/hdd/github/voiceMOS_2023/out_models/train_triplet/09-07-2023_10-41-22/best_model.pt
+nomad_model_path: ./pt-models/nomad_best_model.pt
 
 ssl_out_dim: 768
 
@@ -27,43 +26,23 @@ emb_dim: 256
 margin: 0.2
 
 # Evaluation embedding parameters
-non_match_dir: /media/alergn/hdd/datasets/audio/speech/TSP_speech_subset/train/ref
+non_match_dir: /path/to/non-matching-references
 test_db_file: ./data/test_quality_nogs.csv
 test_db_file_fr: ./data/test_quality_nogs.csv
 db: null
 conds: null
-test_root_wav: /media/alergn/hdd/datasets/audio/speech/
-csv_clean: '/media/alergn/hdd/github/speech-degradator/degraded_data_visqol_scores_snap.csv'
-pretrain: False 
+test_root_wav: /path/to/waves/
 
 # Evaluation monotonocity rank
-#test_mono_data: 'data/test_degradation_intensity.csv'
-#test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDegTestRefUnique'
-test_mono_data: 'data/test_degradation_intensity_new.csv'
-test_mono_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeech/test-clean-degraded-dummy'
+test_mono_data: './data/test_degradation_intensity_new.csv'
+test_mono_wav: '/path/to/Degraded Librispeech test'
 
-# Evaluate MOS predictor embeddings (instead of triplet loss embeddings)
-eval_mos_pred: False
-mos_pred_model: ./out_models/train_mos/30-05-2023_12-38-53/best_model.pt
-architecture: 'w2v'
-
-# Eval orig w2v
+# Eval orig w2v (Set true to evaluate w2v feature vectors)
 eval_w2v: False
-
-# Evaluate embeddings on cross reference data
-cross_ref_db: 'data/LS_triplet_valid_easy_crossref.csv'
-cross_ref_wav: '/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg'
 
 current_level: 
   - 1
   - 2
-#current_level: null
 
-# Spectrogram parameters
-n_mels: 48
-n_fft: 400
-win_length: 400
-hop_length: 200
-patch_length: 16
-max_length: 20
+# Do not trim for testing
 trim: False

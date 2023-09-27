@@ -1,8 +1,6 @@
 import pandas as pd
 import random
 from sklearn.model_selection import GroupShuffleSplit
-import numpy as np
-from itertools import combinations
 from pathlib import Path
 import os
 
@@ -11,22 +9,6 @@ import os
 # You find the csv in the repo if you want to reuse the same train/valid sets. Otherwise specify the random_state in the sample function.
 SEED = 10
 random.seed(SEED)
-
-# Import dataframe
-path = '/media/alergn/hdd/github/speech-degradator/degraded_data_visqol_scores.csv'
-df = pd.read_csv(path)
-df.drop(index=df.index[:2], inplace=True)
-df.dropna(axis=1, inplace=True)
-df['nsim'] = df.iloc[:,3:35].mean(axis=1)
-df = df[['reference', 'degraded', 'nsim']]
-df['degraded'] = ['/'.join(x.split('/')[-2:]) for x in df['degraded']]
-
-# Split train and val based on the clean file (never overlap the same clean file between the partitions)
-splitter = GroupShuffleSplit(test_size=.20, n_splits=1, random_state = SEED)
-split = splitter.split(df, groups=df['reference'])
-train_inds, test_inds = next(split)
-train_df = df.iloc[train_inds]
-val_df = df.iloc[test_inds]
 
 def create_triplets(df, N=1, hard_sampling=True):
     margin = 0.05
@@ -38,8 +20,9 @@ def create_triplets(df, N=1, hard_sampling=True):
     # Create Triplets (Anchor, Positive, Negative)
     for row in df['reference'].unique():
         df_g = df[df['reference'] == row]
-        parts = Path(df_g.iloc[0]['reference']).parts
-        filepath_clean = os.path.join('CLEAN', '/'.join(str(Path(*parts[parts.index('train-clean-100-wav'):])).split('/')[1:]))
+        #parts = Path(df_g.iloc[0]['reference']).parts
+        #filepath_clean = os.path.join('CLEAN', '/'.join(str(Path(*parts[parts.index('train-clean-100-wav'):])).split('/')[1:]))
+        filepath_clean = os.path.join('CLEAN', df_g.iloc[0]['reference'])
         df_clean = pd.DataFrame({'degraded': filepath_clean, 'nsim': [1.0000]})
         df_g = pd.concat([df_g, df_clean])
         df_g.drop('reference', axis=1, inplace=True)
@@ -81,8 +64,10 @@ def create_triplets(df, N=1, hard_sampling=True):
     return df_out
 
 # Create datasets (Easy)
+train_df = pd.read_csv('data/train_nsim.csv')
 train_triplets_df = create_triplets(train_df, N=3, hard_sampling=False)
 train_triplets_df.dropna(axis=0, inplace=True)
+val_df = pd.read_csv('data/valid_nsim.csv')
 valid_triplets_df = create_triplets(val_df, N=3, hard_sampling=False)
 valid_triplets_df.dropna(axis=0, inplace=True)
 

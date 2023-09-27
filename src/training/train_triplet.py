@@ -3,7 +3,7 @@ import torch.nn as nn
 import fairseq
 import yaml
 from src.dataloader.triplet_dataloader import TripletDataset, load_processing
-from src.models.networks import TripletModel, Origw2v, SpecgramModel
+from src.models.networks import TripletModel, Origw2v
 from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
@@ -16,7 +16,6 @@ import random
 from scipy.stats import spearmanr, pearsonr
 from scipy.optimize import curve_fit
 import torch.optim.lr_scheduler as lr_scheduler
-import torchaudio
 from scipy.spatial.distance import cdist
 sns.set_style('darkgrid')
 
@@ -49,46 +48,38 @@ class Training():
             self.DEVICE = 'cpu'
         print(f'Device: {self.DEVICE}')
 
-        if self.config['architecture'] == 'w2v': 
-            # Load SSL model if using wav2vec
-            CHECKPOINT_PATH = self.config['checkpoint_path']
-            SSL_OUT_DIM = self.config['ssl_out_dim']
-            EMB_DIM = self.config['emb_dim']
+        # Load SSL model if using wav2vec
+        CHECKPOINT_PATH = self.config['checkpoint_path']
+        SSL_OUT_DIM = self.config['ssl_out_dim']
+        EMB_DIM = self.config['emb_dim']
 
-            w2v_model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([CHECKPOINT_PATH])
-            ssl_model = w2v_model[0] 
-            ssl_model.remove_pretraining_modules()
-
+        w2v_model, _, _ = fairseq.checkpoint_utils.load_model_ensemble_and_task([CHECKPOINT_PATH])
+        ssl_model = w2v_model[0] 
+        ssl_model.remove_pretraining_modules()
+        
+        if self.config['experiment_name'] == 'Training':
+            self.model = TripletModel(ssl_model, SSL_OUT_DIM, EMB_DIM)
+        else:
             if self.config['eval_w2v']:
                 self.model = Origw2v(ssl_model, SSL_OUT_DIM)
-            else:
-                self.model = TripletModel(ssl_model, SSL_OUT_DIM, EMB_DIM)
-            self.model.to(self.DEVICE)
+        self.model.to(self.DEVICE)
 
-            # Choose if you want to 1) Freeze only ConvNet 2) Freeze ConvNet + Transformer 3) Finetune the entire network
-            # Freeze only ConvNet
-            if self.config['experiment_name'] == 'Training':
-                if self.config['freeze_convnet']:
-                    self.model.ssl_model.feature_extractor.requires_grad_(False)
-                
-                # Freeze both ConvNet and Transformer (no finetuning)
-                if self.config['freeze_all']:
-                    self.model.ssl_model.feature_extractor.requires_grad_(False)
-                    self.model.ssl_model.encoder.requires_grad_(False)
-        
-        # Specgram model (results not reported in paper)
-        elif self.config['architecture'] == 'SpecgramModel':
-            self.model = SpecgramModel()
-            self.model.to(self.DEVICE)
-        
+        # Choose if you want to 1) Freeze only ConvNet 2) Freeze ConvNet + Transformer 3) Finetune the entire network
+        # Freeze only ConvNet
+        if self.config['experiment_name'] == 'Training':
+            if self.config['freeze_convnet']:
+                self.model.ssl_model.feature_extractor.requires_grad_(False)
+            
+            # Freeze both ConvNet and Transformer (no finetuning)
+            if self.config['freeze_all']:
+                self.model.ssl_model.feature_extractor.requires_grad_(False)
+                self.model.ssl_model.encoder.requires_grad_(False)
+
         if self.config['experiment_name'] == 'Training':
             # Create dataloaders
             self.current_level = self.config['current_level']
             self.train_set = TripletDataset(self.config, data_mode='train_df', level=self.current_level)
-            if self.config['architecture'] == 'w2v':
-                collate_fn = self.train_set.collate_fn
-            else:
-                collate_fn = None
+            collate_fn = self.train_set.collate_fn
             self.train_loader = DataLoader(self.train_set, batch_size=self.config['train_bs'], shuffle=True, num_workers=self.config['num_workers'], collate_fn=collate_fn)
             self.valid_set = TripletDataset(self.config, data_mode='valid_df', level=self.current_level)
             self.valid_loader = DataLoader(self.valid_set, batch_size=self.config['val_bs'], shuffle=False, num_workers=self.config['num_workers'], collate_fn=collate_fn)
@@ -100,16 +91,15 @@ class Training():
             self.optim = torch.optim.Adam(self.model.parameters(), lr=self.config['lr'])
 
             # Create optimizer with adaptive learning rate
-            if self.config['architecture'] == 'w2v':
-                if self.config['freeze_convnet']:
-                    params_names_embeddings = [f'embeddings.{j}.weight' for j in range(7)] + [f'embeddings.{j}.bias' for j in range(7)]
-                    params_pt = [param for name, param in self.model.named_parameters() if name not in params_names_embeddings]
-                    params_embeddings = [param for name, param in self.model.named_parameters() if name in params_names_embeddings]                 
-                    # Overwrite optimizer
-                    self.optim = torch.optim.Adam([
-                        {'params': params_pt, 'lr': 1e-5},
-                        {'params': params_embeddings}
-                    ], lr=self.config['lr'])
+            if self.config['freeze_convnet']:
+                params_names_embeddings = [f'embeddings.{j}.weight' for j in range(7)] + [f'embeddings.{j}.bias' for j in range(7)]
+                params_pt = [param for name, param in self.model.named_parameters() if name not in params_names_embeddings]
+                params_embeddings = [param for name, param in self.model.named_parameters() if name in params_names_embeddings]                 
+                # Overwrite optimizer
+                self.optim = torch.optim.Adam([
+                    {'params': params_pt, 'lr': 1e-5},
+                    {'params': params_embeddings}
+                ], lr=self.config['lr'])
         
             # Create learning rate scheduler
             self.lr_scheduler = lr_scheduler.ExponentialLR(self.optim, gamma=self.config['lr_decay_factor'])
@@ -119,13 +109,13 @@ class Training():
         total_loss = 0.0
 
         # Batch data (Anchor, Positive, Negative)
-        for batch_index, (A, P, N, A_lengths, P_lengths, N_lengths) in enumerate(tqdm(dataloader)):
+        for batch_index, (A, P, N) in enumerate(tqdm(dataloader)):
 
-            A, P, N, A_lengths, P_lengths, N_lengths = A.to(self.DEVICE), P.to(self.DEVICE), N.to(self.DEVICE), A_lengths, P_lengths, N_lengths
+            A, P, N = A.to(self.DEVICE), P.to(self.DEVICE), N.to(self.DEVICE)
 
-            A_embs = model(A, A_lengths)
-            P_embs = model(P, P_lengths)
-            N_embs = model(N, N_lengths)
+            A_embs = model(A)
+            P_embs = model(P)
+            N_embs = model(N)
 
             loss = criterion(A_embs, P_embs, N_embs)
 
@@ -142,13 +132,13 @@ class Training():
         total_loss = 0.0
         
         with torch.no_grad():
-            for batch_index, (A, P, N, A_lengths, P_lengths, N_lengths) in enumerate(tqdm(dataloader)):
+            for batch_index, (A, P, N) in enumerate(tqdm(dataloader)):
 
-                A, P, N, A_lengths, P_lengths, N_lengths = A.to(self.DEVICE), P.to(self.DEVICE), N.to(self.DEVICE), A_lengths, P_lengths, N_lengths
+                A, P, N = A.to(self.DEVICE), P.to(self.DEVICE), N.to(self.DEVICE)
 
-                A_embs = model(A, A_lengths)
-                P_embs = model(P, P_lengths)
-                N_embs = model(N, N_lengths)
+                A_embs = model(A)
+                P_embs = model(P)
+                N_embs = model(N)
 
                 loss = criterion(A_embs, P_embs, N_embs)
 
@@ -202,7 +192,8 @@ class Training():
             print(f"EPOCHS: {i+1} train_loss : {train_loss}")
             print(f"EPOCHS: {i+1} valid_loss : {valid_loss}")
             print('\n')
-    
+
+    # *** BELOW FUNCTIONS TO EVALUATE NOMAD ***
     # Function that extract NOMAD embeddings of a db and store them in a csv
     def get_embeddings_csv(self, model, file_names, root=False):
         file_names_arr = np.array(file_names)
@@ -217,32 +208,9 @@ class Training():
                     filepath = filename_anchor
                 
                 test_speech = load_processing(filepath, trim=False)
-                lengths = None
-                
-                # Get log mel spectrograms
-                if self.config['architecture'] == 'SpecgramModel':
-                    test_speech = torchaudio.transforms.MelSpectrogram(
-                    sample_rate=self.config['sampling_rate'],
-                    n_fft=self.config['n_fft'],
-                    win_length=self.config['win_length'],
-                    hop_length=self.config['hop_length'],
-                    n_mels=self.config['n_mels']
-                )(test_speech)
-                    test_speech = torch.log10(test_speech + np.finfo(float).eps)
-
-                    # Split into patches
-                    test_speech = test_speech.unfold(dimension=2, size=self.config['patch_length'], step=self.config['patch_length']//2).permute(2, 0, 1, 3)
-                    lengths = test_speech.shape[0]
-
-                    # Store lengths into a tensor 
-                    if not torch.is_tensor(lengths):
-                        lengths = torch.Tensor([lengths])
-                    
-                    # Add batch size dimension (always equal to 1 during test)
-                    test_speech.unsqueeze_(0)
                 
                 test_speech = test_speech.to(self.DEVICE)
-                anc_embeddings = model(test_speech, lengths)
+                anc_embeddings = model(test_speech)
                 embeddings.append(anc_embeddings.squeeze().cpu().detach().numpy())
 
             embeddings = np.array(embeddings)

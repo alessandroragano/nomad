@@ -1,15 +1,17 @@
-# Root where to store datasets (default ./data)
-root: '/media/alergn/hdd/datasets/audio/speech/LibriSpeech'
+# Root to Librispeech
+root: '/path/to/librispeech/'
 
 # Training (Nomad train and valid sets) path settings
 in_dir_train: 'train-clean-100'
 in_dir_train_wav: 'train-clean-100-wav'
-out_dir_train: 'train-clean-100-degraded-dummy'
+
+# This is where you store degraded Librispeech samples. Script will create subdirs (CLIP, NOISE, OPUS, MP3)
+out_dir_train: 'train-clean-100-degraded'
 
 # Test (degradation intensity) path settings
 in_dir_test: 'test-clean'
 in_dir_test_wav: 'test-clean-wav'
-out_dir_test: 'test-clean-degraded-dummy'
+out_dir_test: 'test-clean-degraded'
 
 # Sampling rate
 sr: 16000
@@ -26,8 +28,8 @@ opus_test: ['2k', '5k', '9k', '12k', '18k', '20k', '24k', '30k', '36k', '42k', '
 clip_train: [5, 10, 25, 40, 60]
 clip_test: [2, 5, 6, 8, 11, 12, 15, 18, 20, 22, 24, 27, 29, 30, 33, 35, 37, 39, 41, 50, 62]
 
-# SNR dB
-root_noise: '/media/alergn/hdd/datasets/audio/speech/'
+# SNR dB (You need to download the MS-SNSD noise files)
+root_noise: '/path/to/MS-SNSD'
 noise_train: [0, 8, 15, 25, 40]
 noise_dir_train: 'MS-SNSD/noise_train'
 noise_test: [1, 3, 4, 6, 9, 10, 12, 14, 16, 19, 20, 22, 24, 26, 28, 30, 32, 33, 35, 37, 39, 42, 44, 46, 50]

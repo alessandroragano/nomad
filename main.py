@@ -43,9 +43,5 @@ def training(config_file):
     elif config['experiment_name'] == 'quality_fr':
         train_obj.eval_full_reference(config['nomad_model_path'])
 
-    # PLOT PERFORMANCE (to check)
-    elif config['experiment_name'] == 'Plot':
-        train_obj.plot_performance()
-
 if __name__ == '__main__':
     training()  

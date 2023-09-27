@@ -5,21 +5,16 @@ out_dir: "train_triplet"
 training_script: "src.training.train_triplet"
 
 # Path to csv file and root dir (relative to main file)
-#root: "/media/alergn/hdd/datasets/audio/speech/MS-SNSD/"
-#train_df: "data/MS_triplets_train_semihard.csv"
-#valid_df: "data/MS_triplets_valid_semihard.csv"
-root: "/media/alergn/hdd/datasets/audio/speech/LibriSpeechDeg/"
-#train_df: "data/LS_triplet_train_incremental2.csv"
-#valid_df: "data/LS_triplet_valid_incremental2.csv"
-train_df: "data/LS_triplet_train_newt.csv"
-valid_df: "data/LS_triplet_valid_newt.csv"
+root: "/path/to/Degraded Librispeech"
+train_df: data/train.csv
+valid_df: data/valid.csv
 
 # Feature parameters
 sampling_rate: 16000
 
 # Hyper parameter
-train_bs: 2
-val_bs: 2
+train_bs: 8
+val_bs: 8
 test_bs: 1
 lr: 0.0001
 lr_decay_factor: 0.99
@@ -29,10 +24,10 @@ num_workers: 6
 emb_dim: 256
 
 # Early stopping
-patience: 1
+patience: 200
  
 # wav2vec pretrained model path
-checkpoint_path: "/media/alergn/hdd/github/dcec-tcd-voip/models/voiceMOS/Wav2VecSmall/wav2vec_small.pt"
+checkpoint_path: "pt-models/wav2vec_small.pt"
 ssl_out_dim: 768
 margin: 0.2
 
@@ -40,22 +35,10 @@ margin: 0.2
 freeze_convnet: True
 freeze_all: False
 
-# Choose which model to train
-architecture: 'w2v'
-
-# Set this to true if you want to evaluate original w2v features
-eval_w2v: False
-
 # Level db ### 1 EASY Sampling, ### 2 HARD Sampling, ### 1,2 both
 current_level: 
   - 1
   - 2
 
-# Spectrogram parameters
-n_mels: 48
-n_fft: 400
-win_length: 400
-hop_length: 200
-patch_length: 16
-max_length: 20
-trim: False
+# Training is done by trimming to 10 secs each training file that is longer, not used during testing
+trim: True

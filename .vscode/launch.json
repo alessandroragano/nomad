@@ -61,5 +61,30 @@
             "justMyCode": true
         },
 
+        {
+            "name": "Test NOMAD score pip",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_pip.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config_file", "src/config/test_pip.yaml",
+            ],
+            "justMyCode": true
+        },
+
+        {
+            "name": "Test NOMAD loss",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_nomad_loss.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config_file", "src/config/test_nomad_loss.yaml",
+            ],
+            "justMyCode": false
+        },
+
+
     ]
 }
