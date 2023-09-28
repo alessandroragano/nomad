@@ -2,6 +2,7 @@
 data/*
 !data/train.csv
 !data/valid.csv
+!data/nomad_dataset.md
 out-models/
 out_models/
 pt-models/

@@ -1,11 +1,11 @@
-# Non-Matching Audio Distance (NOMAD)
+# NOMAD: Non-Matching Audio Distance
 
-NOMAD is a differentiable perceptual similarity metric that measures the distance of a degraded signal against non-matching references (unpaired speech).
-The proposed method is based on learning deep feature embeddings via a triplet loss guided by the Neurogram Similarity Index Measure (NSIM) to capture degradation intensity. During inference, the similarity score between any two audio samples is computed through Euclidean distance of their embedding.
-NOMAD can be also used as a loss function to improve speech enhancement models.
+NOMAD is a perceptual similarity metric for non-matching reference speech quality assessment. NOMAD embeddings can be used to:
+* Measuring quality with any clean reference e.g., both paired and unpaired speech
+* As a loss function to improve speech enhancement models
 
 ## Table of contents
-- [Non-Matching Audio Distance (NOMAD)](#non-matching-audio-distance--nomad-)
+- [NOMAD: Non-Matching Audio Distance](#non-matching-audio-distance--nomad-)
   * [Installation](#installation)
   * [Using NOMAD similarity score](#using-nomad-similarity-score)
     + [Using NOMAD from the command line](#using-nomad-from-the-command-line)
@@ -117,17 +117,17 @@ We evaluated NOMAD for ranking degradation intensity, speech quality assessment,
 See the paper for more details. 
 As clean non-matching references, we extracted 899 samples from the [TSP](https://www.mmsp.ece.mcgill.ca/Documents/Data/) speech database.
 
-Here we show the scatter plot between NOMAD scores and MOS quality labels. For each database we mapped NOMAD scores to MOS using a third order polynomial. 
+Here we show the scatter plot between NOMAD scores (computed with unpaired speech) and MOS quality labels. For each database we mapped NOMAD scores to MOS using a third order polynomial. 
 Notice that performances are reported without mapping in the paper.
 
 #### [Genspeech](https://arxiv.org/abs/2102.10449)
-![genspeech](https://github.com/alessandroragano/nomad/blob/main/figs/Genspeech_embeddings.png?raw=true)
+![genspeech](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/Genspeech_embeddings.png)
 
 #### [P23 EXP1](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![p23_exp1](https://github.com/alessandroragano/nomad/blob/main/figs/P23_EXP1_embeddings.png)
+![p23_exp1](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/P23_EXP1_embeddings.png)
 
 #### [P23 EXP3](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![p23_exp3](https://github.com/alessandroragano/nomad/blob/main/figs/P23_EXP3_embeddings.png)
+![p23_exp3](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/P23_EXP3_embeddings.png)
 
 ## Paper and license
 Pre-print will be available soon.
