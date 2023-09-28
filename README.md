@@ -124,11 +124,10 @@ Notice that performances are reported without mapping in the paper.
 ![genspeech](https://github.com/alessandroragano/nomad/blob/main/figs/Genspeech_embeddings.png?raw=true)
 
 #### [P23 EXP1](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![p23_exp1](figs/P23_EXP1_embeddings.png)
+![p23_exp1](https://github.com/alessandroragano/nomad/blob/main/figs/P23_EXP1_embeddings.png)
 
 #### [P23 EXP3](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![p23_exp3](figs/P23_EXP3_embeddings.png)
-
+![p23_exp3](https://github.com/alessandroragano/nomad/blob/main/figs/P23_EXP3_embeddings.png)
 
 ## Paper and license
 Pre-print will be available soon.
