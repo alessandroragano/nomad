@@ -25,6 +25,8 @@ NOMAD is hosted on PyPi. It can be installed in your Python environment with the
 pip install nomad_audio
 ```
 
+NOMAD was built with Python 3.9.16.
+
 ## Using NOMAD similarity score
 ### Using NOMAD from the command line
 NOMAD similarity score can be used to measure perceptual similarity between any two signals. NOMAD can be used with unpaired speech i.e., any clean speech can serve as a reference. You can use NOMAD from the command line as follows:  
