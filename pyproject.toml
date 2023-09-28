@@ -9,7 +9,7 @@ exclude = ["data*", "pt-models*", ".vscode*", "se-models*", "results-csv*"]
 
 [project]
 name = "nomad_audio"
-version = "0.0.3"
+version = "0.0.4"
 description = "Perceptual similarity embeddings for non-matching reference audio quality assessment and speech enhancement"
 readme = "README.md"
 authors = [

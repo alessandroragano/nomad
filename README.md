@@ -121,13 +121,13 @@ Here we show the scatter plot between NOMAD scores and MOS quality labels. For e
 Notice that performances are reported without mapping in the paper.
 
 #### [Genspeech](https://arxiv.org/abs/2102.10449)
-![Screenshot](figs/Genspeech_embeddings.png)
+![genspeech](https://github.com/alessandroragano/nomad/blob/main/figs/Genspeech_embeddings.png?raw=true)
 
 #### [P23 EXP1](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![Screenshot](figs/P23_EXP1_embeddings.png)
+![p23_exp1](figs/P23_EXP1_embeddings.png)
 
 #### [P23 EXP3](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
-![Screenshot](figs/P23_EXP3_embeddings.png)
+![p23_exp3](figs/P23_EXP3_embeddings.png)
 
 
 ## Paper and license
