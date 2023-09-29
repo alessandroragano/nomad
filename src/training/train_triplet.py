@@ -42,7 +42,7 @@ class Training():
             self.config = yaml.load(file, Loader=yaml.FullLoader)
 
         # Find device
-        if torch.cuda.is_available:
+        if torch.cuda.is_available():
             self.DEVICE = 'cuda'
         else:
             self.DEVICE = 'cpu'

@@ -3,6 +3,8 @@ data/*
 !data/train.csv
 !data/valid.csv
 !data/nomad_dataset.md
+!data/nmr-data/
+!data/test-data/
 out-models/
 out_models/
 pt-models/
@@ -19,3 +21,4 @@ config/test_nomad_loss.yaml
 config/test_pip.yaml
 utils/librispeechdeg_subset.py
 **/__pycache__/
+pyproject.toml

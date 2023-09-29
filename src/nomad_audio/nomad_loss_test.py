@@ -33,7 +33,7 @@ torch.backends.cudnn.benchmark = False
 class SpeechEnhancement():
     def __init__(self):  
         # Find device
-        if torch.cuda.is_available:
+        if torch.cuda.is_available():
             self.DEVICE = 'cuda'
         else:
             self.DEVICE = 'cpu'

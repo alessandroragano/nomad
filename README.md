@@ -39,7 +39,26 @@ The script creates two csv files in ```results-csv``` with date time format.
 * ```DD-MM-YYYY_hh-mm-ss_nomad_avg.csv``` includes the average NOMAD scores with respect to all the references in ```nmr_path``` 
 * ```DD-MM-YYYY_hh-mm-ss_nomad_scores.csv``` includes pairwise scores between the degraded speech samples in ```test_path``` and the references in ```nmr_path```
 
-You can choose where to save the csv files by setting ```results_path```. 
+You can choose where to save the csv files by setting ```results_path```.
+
+To start, run NOMAD with some speech files that we provided in the repo:
+```
+python -m nomad_audio --nmr_path data/nmr-data --test_path data/test-data
+```
+
+The resulting csv file ```DD-MM-YYYY_hh-mm-ss_nomad_avg.csv``` shows the mean computed using the 4 non-matching reference files:
+```
+Test File                  NOMAD
+445-123860-0012_NOISE_15   1.587
+6563-285357-0042_OPUS_64k  0.294
+``` 
+
+The other csv file ```DD-MM-YYYY_hh-mm-ss_nomad_scores.csv``` includes the pairwise scores between the degraded and the non-matching reference files:
+```
+Test File                  MJ60_10  FL67_01  FI53_04  MJ57_01
+445-123860-0012_NOISE_15   1.627    1.534    1.629    1.561
+6563-285357-0042_OPUS_64k  0.23     0.414    0.186    0.346
+```
 
 ### Using NOMAD inside Python
 You can import NOMAD as a module in Python. Here is an example:

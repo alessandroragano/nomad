@@ -13,12 +13,14 @@ from datetime import datetime
 
 # *** Pytorch models download options ****
 if not os.path.isdir('./pt-models'):
+    print('Creating pt-models directory')
     os.makedirs('./pt-models')
 
 # Download wav2vec 2.0 base
 url_w2v = "https://dl.fbaipublicfiles.com/fairseq/wav2vec/wav2vec_small.pt"
 w2v_path = 'pt-models/wav2vec_small.pt'
 if not os.path.isfile(w2v_path):
+    print('Downloading wav2vec 2.0 started')
     urlretrieve(url_w2v, w2v_path)
     print('Model wav2vec 2.0 download completed')
 
@@ -26,15 +28,16 @@ if not os.path.isfile(w2v_path):
 url_nomad_db = 'https://www.dropbox.com/scl/fi/uws3wk327adbwqo22cr0p/nomad_best_model.pt?rlkey=cco21iba6xxi81a0dm9lpa7zj&dl=1'
 nomad_path = 'pt-models/nomad_best_model.pt'
 if not os.path.isfile(nomad_path):
+    print('Downloading NOMAD model started')
     urlretrieve(url_nomad_db, nomad_path)
-    print('Model nomad download completed')
+    print('Model NOMAD download completed')
 
 class Nomad():
     def __init__(self, device=None):
 
         # *** DEVICE SETTINGS ***
         # Automatically set based on GPU detection
-        if torch.cuda.is_available:
+        if torch.cuda.is_available():
             self.DEVICE = 'cuda'
         else:
             self.DEVICE = 'cpu'
@@ -59,7 +62,7 @@ class Nomad():
         # Create NOMAD model
         model = TripletModel(ssl_model, SSL_OUT_DIM, EMB_DIM)
         MODEL_PATH = nomad_path
-        model.load_state_dict(torch.load(MODEL_PATH))  
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=self.DEVICE))  
         self.model = model
         self.model.to(self.DEVICE)
         self.model.eval()
