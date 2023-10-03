@@ -57,11 +57,9 @@ class Training():
         ssl_model = w2v_model[0] 
         ssl_model.remove_pretraining_modules()
         
-        if self.config['experiment_name'] == 'Training':
-            self.model = TripletModel(ssl_model, SSL_OUT_DIM, EMB_DIM)
-        else:
-            if self.config['eval_w2v']:
-                self.model = Origw2v(ssl_model, SSL_OUT_DIM)
+        self.model = TripletModel(ssl_model, SSL_OUT_DIM, EMB_DIM)
+        if self.config['eval_w2v']:
+            self.model = Origw2v(ssl_model, SSL_OUT_DIM)
         self.model.to(self.DEVICE)
 
         # Choose if you want to 1) Freeze only ConvNet 2) Freeze ConvNet + Transformer 3) Finetune the entire network
