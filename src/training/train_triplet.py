@@ -17,7 +17,13 @@ from scipy.stats import spearmanr, pearsonr
 from scipy.optimize import curve_fit
 import torch.optim.lr_scheduler as lr_scheduler
 from scipy.spatial.distance import cdist
+from sklearn.decomposition import PCA
 sns.set_style('darkgrid')
+
+def label_point(x, y, val, ax):
+    a = pd.concat({'x': x, 'y': y, 'val': val}, axis=1)
+    for i, point in a.iterrows():
+        ax.text(point['x']+.04, point['y'], str(point['val']))
 
 # REPRODUCIBILITY 
 SEED = 0
@@ -354,6 +360,10 @@ class Training():
         degr_data = []
         srcc_scores = []
 
+        degradations = [len(ref_embeddings) * ['Unpaired Clean']]
+        conditions_pca = [len(ref_embeddings) * ['Unpaired Clean']]
+        test_db = [ref_embeddings]
+
         for deg_name, deg_data in test_data_group:
             df_emb = self.get_embeddings_csv(self.model, deg_data['filepath_deg'], root=self.config['test_mono_wav']) 
 
@@ -367,6 +377,7 @@ class Training():
             # Add distances 
             df_dist = pd.DataFrame({'filepath_deg': names, 'Distance': avg_dist_nmr})
             df_dist = df_dist.merge(test_names, on='filepath_deg')
+            df_dist.set_index('filepath_deg', inplace=True)
             df_dist = df_dist.groupby('Condition').mean().reset_index()
             df_dist.sort_values(by='Distance', inplace=True)
             
@@ -379,6 +390,32 @@ class Training():
             srcc_scores.append([SRCC]*len(df_dist))
             print(f'Degradation: {deg_name}')
             print(f'SRCC: {np.round(SRCC, 2)}')
+
+            # Store for PCA
+            degradations.append([deg_name] * len(test_embeddings))
+            conditions = ['_'.join(x.split('/')[1].split('_')[-2:]).split('.')[0] for x in names]
+            if len(test_embeddings) != len(conditions):
+                print('dd')
+            conditions_pca.append(conditions)
+            test_db.append(test_embeddings)
+        
+        # Compute PCA
+        pca_plot = False
+        if pca_plot:
+            df_pca = pd.concat(test_db)
+            pca = PCA(n_components=2)
+            pca_features = pca.fit_transform(df_pca)
+            pca_features = pd.DataFrame(pca_features)
+            pca_features['Condition'] = np.concatenate(conditions_pca)
+            pca_features = pca_features.groupby('Condition').mean().reset_index()
+            p1 = sns.scatterplot(data=pca_features, x=0, y=1, hue='Condition', legend=False)
+            #label_point(pca_features[0], pca_features[1], pca_features['Condition'], plt.gca())  
+            for line in range(0,pca_features.shape[0]):
+                if line % 10 == 0:
+                    p1.text(pca_features[0][line]-0.02, pca_features[1][line] + 0.01, 
+                    pca_features['Condition'][line], horizontalalignment='left', 
+                    size='medium', color='black', weight='semibold')
+            plt.savefig('pca_figs/nomad_embeddings_pca.png')
 
     def eval_full_reference(self, model_path):
         self.model.load_state_dict(torch.load(model_path))

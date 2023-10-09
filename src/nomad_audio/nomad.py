@@ -22,15 +22,15 @@ w2v_path = 'pt-models/wav2vec_small.pt'
 if not os.path.isfile(w2v_path):
     print('Downloading wav2vec 2.0 started')
     urlretrieve(url_w2v, w2v_path)
-    print('Model wav2vec 2.0 download completed')
+    print('wav2vec 2.0 download completed')
 
 # Download NOMAD
 url_nomad_db = 'https://www.dropbox.com/scl/fi/uws3wk327adbwqo22cr0p/nomad_best_model.pt?rlkey=cco21iba6xxi81a0dm9lpa7zj&dl=1'
 nomad_path = 'pt-models/nomad_best_model.pt'
 if not os.path.isfile(nomad_path):
-    print('Downloading NOMAD model started')
+    print('Downloading NOMAD weights started')
     urlretrieve(url_nomad_db, nomad_path)
-    print('Model NOMAD download completed')
+    print('NOMAD weights download completed')
 
 class Nomad():
     def __init__(self, device=None):
@@ -79,21 +79,30 @@ class Nomad():
         self.nomad_loss.to(self.DEVICE)
         self.nomad_loss.eval()
 
-    def predict(self,  nmr_path='data/nmr-data', test_path='data/test-data', results_path=None):
-        if nmr_path is None:
+    def predict(self,  mode='dir', nmr='data/nmr-data', deg='data/test-data', results_path=None):
+        if nmr is None:
             raise Exception('nmr_path not specified, you need to pass a valid value to nmr_path')
-        if test_path is None:
+        if deg is None:
             raise Exception('test_path not specified, you need to pass a valide value to test_path')        
-        if os.path.isdir(nmr_path) == False:
-            raise Exception(f'Path to the non-matching reference files {nmr_path} does not exist')
-        if os.path.isdir(test_path) == False:
-            raise Exception(f'Path to the non-matching reference files {test_path} does not exist')
         
-        print(f'Loading non-matching references from {nmr_path}')
-        nmr_embeddings = self.get_embeddings(nmr_path).set_index('filename')
+        if mode == 'dir':
+            if os.path.isdir(nmr) == False:
+                raise Exception(f'Path to the non-matching reference files {nmr} does not exist')
+            if os.path.isdir(deg) == False:
+                raise Exception(f'Path to the test files {deg} does not exist')
+        elif mode == 'csv':
+            if os.path.isfile(nmr) == False:
+                raise Exception(f'File {nmr} does not exist')
+            if os.path.isfile(deg) == False:
+                raise Exception(f'File {deg} does not exist')
+        else:
+            raise Exception(f'Mode value {mode} is not valid. Valid values are dir and csv')
         
-        print(f'Loading test files from {test_path}')
-        test_embeddings = self.get_embeddings(test_path).set_index('filename')
+        print(f'Compute non-matching reference embeddings from {nmr}')
+        nmr_embeddings = self.get_embeddings(nmr).set_index('filename')
+        
+        print(f'Compute degraded embeddings from {deg}')
+        test_embeddings = self.get_embeddings(deg).set_index('filename')
 
         # Compute pairwise distance matrix
         distance_matrix = cdist(test_embeddings, nmr_embeddings)
@@ -137,11 +146,18 @@ class Nomad():
         return loss
 
     def get_embeddings(self, path):
-        # Dataframe
-        data = pd.DataFrame(os.listdir(path))
-        data.columns = ['filename']
-        data['filename'] = [os.path.join(path, x) for x in data['filename']]
-        
+        # If mode == dir
+        if os.path.isdir(path):
+            # Dataframe
+            data = pd.DataFrame(os.listdir(path))
+            data.columns = ['filename']
+            data['filename'] = [os.path.join(path, x) for x in data['filename']]
+        # If mode == csv
+        elif os.path.isfile(path):
+            data = pd.read_csv(path)
+            if 'filename' not in data.columns:
+                raise Exception('File {path} not including a column called filename. Please pass a csv file with a column called filename that includes the absolute filpaths of the waveforms.')
+
         # Calculate embeddings
         embeddings  = self.get_embeddings_csv(self.model, data)
         return embeddings

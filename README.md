@@ -25,25 +25,41 @@ NOMAD is hosted on PyPi. It can be installed in your Python environment with the
 pip install nomad_audio
 ```
 
+The model works with 16 kHz sampling rate. If your wav files have different sampling rates, automatic downsampling or upsampling is performed.
+
 NOMAD was built with Python 3.9.16.
 
 ## Using NOMAD similarity score
+Data wav files can be passed in 2 modes:
+* In ```mode=='dir'```, you need to indicate two directories for the reference and the degraded .wav files.  
+* In ```mode=='csv```, you need to indicated two csv for the reference and the degraded .wav files.
+
+Reference files can be any clean speech.
+
 ### Using NOMAD from the command line
-NOMAD similarity score can be used to measure perceptual similarity between any two signals. NOMAD can be used with unpaired speech i.e., any clean speech can serve as a reference. You can use NOMAD from the command line as follows:  
 
+To predict perceptual similarity of all .wav files between two directories:
 ```
-python -m nomad_audio --nmr_path /path/to/dir/non-matching-references --test_path /path/to/dir/degraded
+python -m nomad_audio --mode dir --nmr /path/to/dir/non-matching-references --deg /path/to/dir/degraded
 ```
 
-The script creates two csv files in ```results-csv``` with date time format. 
+To predict perceptual similarity of all .wav files between two csv files:
+```
+python -m nomad_audio --mode csv --nmr /path/to/csv/non-matching-references --deg /path/to/csv/degraded
+```
+
+Both csv files should include a column ```filename``` with the absolute path for each wav file.
+
+
+In both modes, the script will create two csv files in ```results-csv``` with date time format. 
 * ```DD-MM-YYYY_hh-mm-ss_nomad_avg.csv``` includes the average NOMAD scores with respect to all the references in ```nmr_path``` 
 * ```DD-MM-YYYY_hh-mm-ss_nomad_scores.csv``` includes pairwise scores between the degraded speech samples in ```test_path``` and the references in ```nmr_path```
 
 You can choose where to save the csv files by setting ```results_path```.
 
-To start, run NOMAD with some speech files that we provided in the repo:
+You can run this example using some .wav files that are provided in the repo:
 ```
-python -m nomad_audio --nmr_path data/nmr-data --test_path data/test-data
+python -m nomad_audio --mode dir --nmr_path data/nmr-data --test_path data/test-data
 ```
 
 The resulting csv file ```DD-MM-YYYY_hh-mm-ss_nomad_avg.csv``` shows the mean computed using the 4 non-matching reference files:
@@ -69,7 +85,7 @@ from nomad_audio import nomad
 nmr_path = 'data/nmr-data'
 test_path = 'data/test-data'
 
-nomad_avg_scores, nomad_scores = nomad.predict(nmr_path, test_path)
+nomad_avg_scores, nomad_scores = nomad.predict('dir', nmr_path, test_path)
 ```
 
 ## Using NOMAD loss function
@@ -101,7 +117,7 @@ Steps to reproduce this experiment:
 
 Notice that the Valentini dataset does not explicitly provide a validation partition. We created one by using speech samples from speakers ```p286``` and ```p287``` from the training set.
 
-See the paper for more details on speech enhancement results using the model DEMUCS.
+See the paper for more details on speech enhancement results using the model DEMUCS and evaluated with subjective listening tests.
 
 ### NOMAD loss weighting
 We recommend to tune the weight of the NOMAD loss. Paper results with the DEMUCS model has been done by setting the weight to `0.1`. 
@@ -151,5 +167,10 @@ Notice that performances are reported without mapping in the paper.
 ![p23_exp3](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/P23_EXP3_embeddings.png)
 
 ## Paper and license
-Pre-print will be available soon.
+If you use NOMAD or the training corpus for your research, please cite this [pre-print](https://arxiv.org/abs/2309.16284).
+
+Ragano, A., Skoglund, J. and Hines, A., 2023. NOMAD: Unsupervised Learning of Perceptual Embeddings for Speech Enhancement and Non-matching Reference Audio Quality Assessment. arXiv preprint arXiv:2309.16284.
+
 The NOMAD code is licensed under MIT license.
+
+Copyright © 2023 Alessandro Ragano

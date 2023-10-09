@@ -7,6 +7,7 @@ data/*
 !data/test-data/
 out-models/
 out_models/
+pca_figs/
 pt-models/
 se-models/
 *.pyc
@@ -22,3 +23,4 @@ config/test_pip.yaml
 utils/librispeechdeg_subset.py
 **/__pycache__/
 pyproject.toml
+src/config/eval_triplet_local.yaml
