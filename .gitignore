@@ -24,3 +24,4 @@ utils/librispeechdeg_subset.py
 **/__pycache__/
 pyproject.toml
 src/config/eval_triplet_local.yaml
+pca_colorbar.png

@@ -269,7 +269,7 @@ class Training():
 
             # Add distances 
             df_dist = pd.DataFrame({'filepath_deg': names, 'Distance': avg_dist_nmr})
-            df_dist = df_dist.merge(test_names, on='filepath_deg')
+            df_dist = df_dist.merge(test_names, on='filepath_deg').set_index('filepath_deg')
             df_dist = df_dist.groupby('condition').mean()
 
             # Compute third order poly mapping (performance in the paper are reported without mapping)
