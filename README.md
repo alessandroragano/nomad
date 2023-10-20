@@ -31,8 +31,8 @@ NOMAD was built with Python 3.9.16.
 
 ## Using NOMAD similarity score
 Data wav files can be passed in 2 modes:
-* In ```mode=='dir'```, you need to indicate two directories for the reference and the degraded .wav files.  
-* In ```mode=='csv```, you need to indicated two csv for the reference and the degraded .wav files.
+* In ```mode 'dir'```, you need to indicate two directories for the reference and the degraded .wav files.  
+* In ```mode 'csv```, you need to indicate two csv for the reference and the degraded .wav files.
 
 Reference files can be any clean speech.
 
@@ -45,7 +45,7 @@ python -m nomad_audio --mode dir --nmr /path/to/dir/non-matching-references --de
 
 To predict perceptual similarity of all .wav files between two csv files:
 ```
-python -m nomad_audio --mode csv --nmr /path/to/csv/non-matching-references --deg /path/to/csv/degraded
+python -m nomad_audio --mode csv --nmr /path/to/csv/non-matching-references.csv --deg /path/to/csv/degraded.csv
 ```
 
 Both csv files should include a column ```filename``` with the absolute path for each wav file.
@@ -55,7 +55,7 @@ In both modes, the script will create two csv files in ```results-csv``` with da
 * ```DD-MM-YYYY_hh-mm-ss_nomad_avg.csv``` includes the average NOMAD scores with respect to all the references in ```nmr_path``` 
 * ```DD-MM-YYYY_hh-mm-ss_nomad_scores.csv``` includes pairwise scores between the degraded speech samples in ```test_path``` and the references in ```nmr_path```
 
-You can choose where to save the csv files by setting ```results_path```.
+Choosing where to save the csv files can be done by setting ```results_path```.
 
 You can run this example using some .wav files that are provided in the repo:
 ```
@@ -77,7 +77,7 @@ Test File                  MJ60_10  FL67_01  FI53_04  MJ57_01
 ```
 
 ### Using NOMAD inside Python
-You can import NOMAD as a module in Python. Here is an example:
+NOMAD can be imported as a Python module. Here is an example:
 
 ```{python}
 from nomad_audio import nomad 
@@ -120,7 +120,7 @@ Notice that the Valentini dataset does not explicitly provide a validation parti
 See the paper for more details on speech enhancement results using the model DEMUCS and evaluated with subjective listening tests.
 
 ### NOMAD loss weighting
-We recommend to tune the weight of the NOMAD loss. Paper results with the DEMUCS model has been done by setting the weight to `0.1`. 
+We recommend to tune the weight of the NOMAD loss. Paper results with the DEMUCS model uses a weight of `0.1`. 
 The U-Net model provided in this repo uses a weight equal to `0.001`.
 
 
@@ -138,7 +138,7 @@ In addition, we provide [instructions](data/nomad_dataset.md) to generate the da
 
 ### Training the model
 The following steps are required to train the model:
-1. Download wav2vec from this [link](https://dl.fbaipublicfiles.com/fairseq/wav2vec/wav2vec_small.pt) and save it into ```pt-models```. If you ran above ```pip install nomad_audio``` in your working directory you can skip this step.
+1. Download wav2vec from this [link](https://dl.fbaipublicfiles.com/fairseq/wav2vec/wav2vec_small.pt) and save it into ```pt-models```. You can skip this step if you installed the pip package with ```pip install nomad_audio``` in your working directory.
 2. Change the following parameters in ```src/config/train_triplet.yaml```
     * ```root``` should be set to degraded Librispeech dataset path
 3. From the working directory run: 
