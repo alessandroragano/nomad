@@ -17,7 +17,7 @@ NOMAD is a perceptual similarity metric for non-matching reference speech qualit
     + [Dataset generation](#dataset-generation)
     + [Training the model](#training-the-model)
   * [Performance](#performance)
-  * [Paper and license](#paper-and-license)
+  * [ICASSP 2024](#icassp-2024)
 
 ## Installation
 NOMAD is hosted on PyPi. It can be installed in your Python environment with the following command
@@ -166,10 +166,20 @@ Notice that performances are reported without mapping in the paper.
 #### [P23 EXP3](https://www.itu.int/ITU-T/recommendations/rec.aspx?id=4415&lang=en)
 ![p23_exp3](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/P23_EXP3_embeddings.png)
 
-## Paper and license
-If you use NOMAD or the training corpus for your research, please cite this [pre-print](https://arxiv.org/abs/2309.16284).
-
-Ragano, A., Skoglund, J. and Hines, A., 2023. NOMAD: Unsupervised Learning of Perceptual Embeddings for Speech Enhancement and Non-matching Reference Audio Quality Assessment. arXiv preprint arXiv:2309.16284.
+## ICASSP 2024
+If you use NOMAD or the training corpus for your research, please cite our paper published in [ICASSP 2024](https://arxiv.org/abs/2309.16284).
+```
+@INPROCEEDINGS{10448028,
+  author={Ragano, Alessandro and Skoglund, Jan and Hines, Andrew},
+  booktitle={ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={NOMAD: Unsupervised Learning of Perceptual Embeddings For Speech Enhancement and Non-Matching Reference Audio Quality Assessment}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={1011-1015},
+  keywords={Degradation;Speech enhancement;Signal processing;Predictive models;Feature extraction;Acoustic measurements;Loss measurement;Perceptual measures of audio quality; objective and subjective quality assessment; speech enhancement},
+  doi={10.1109/ICASSP48485.2024.10448028}}
+``` 
 
 The NOMAD code is licensed under MIT license.
 
