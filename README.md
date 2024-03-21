@@ -1,6 +1,8 @@
 # NOMAD: Non-Matching Audio Distance
 
-NOMAD is a perceptual similarity metric for non-matching reference speech quality assessment. NOMAD embeddings can be used to:
+NOMAD is a perceptual audio similarity metric trained without using human quality scores e.g., MOS. 
+
+NOMAD embeddings can be used to:
 * Measuring quality with any clean reference e.g., both paired and unpaired speech
 * As a loss function to improve speech enhancement models
 
@@ -167,7 +169,7 @@ Notice that performances are reported without mapping in the paper.
 ![p23_exp3](https://raw.githubusercontent.com/alessandroragano/nomad/main/figs/P23_EXP3_embeddings.png)
 
 ## ICASSP 2024
-If you use NOMAD or the training corpus for your research, please cite our paper published in [ICASSP 2024](https://arxiv.org/abs/2309.16284).
+If you use NOMAD or the training corpus for your research, please cite our ICASSP 2024 [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10448028).
 ```
 @INPROCEEDINGS{10448028,
   author={Ragano, Alessandro and Skoglund, Jan and Hines, Andrew},
