@@ -42,3 +42,6 @@ current_level:
 
 # Training is done by trimming to 10 secs each training file that is longer, not used during testing
 trim: True
+
+# Eval orig w2v
+eval_w2v: False
