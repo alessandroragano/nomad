@@ -71,9 +71,9 @@ class Nomad():
         self.lossnet_layers = LossNetLayers(ssl_model, SSL_OUT_DIM, EMB_DIM)
         self.lossnet_layers.to(self.DEVICE)
         
-        # Freeze update (no need to update gradient only propagate)
-        for p in self.lossnet_layers.parameters():
-            p.requires_grad=False
+        # Freeze update (no need to update gradient only propagate) -> Needs test
+        #for p in self.lossnet_layers.parameters():
+        #    p.requires_grad=False
         
         self.nomad_loss = NomadLoss()
         self.nomad_loss.to(self.DEVICE)
