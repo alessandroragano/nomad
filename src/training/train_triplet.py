@@ -96,7 +96,8 @@ class Training():
 
             # Create optimizer with adaptive learning rate
             if self.config['freeze_convnet']:
-                params_names_embeddings = [f'embeddings.{j}.weight' for j in range(7)] + [f'embeddings.{j}.bias' for j in range(7)]
+                # params_names_embeddings = [f'embeddings.{j}.weight' for j in range(7)] + [f'embeddings.{j}.bias' for j in range(7)]
+                params_names_embeddings = ['embedding_layer.1.weight', 'embedding_layer.1.bias']
                 params_pt = [param for name, param in self.model.named_parameters() if name not in params_names_embeddings]
                 params_embeddings = [param for name, param in self.model.named_parameters() if name in params_names_embeddings]                 
                 # Overwrite optimizer
