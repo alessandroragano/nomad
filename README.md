@@ -1,5 +1,9 @@
 # NOMAD: Non-Matching Audio Distance
+_+++ **News:** We released SCOREQ, a new speech quality metric inspired by NOMAD and trained with MOS labels. SCOREQ can be used in no-reference, full-reference, and non-matching reference modes. [Link here](https://github.com/alessandroragano/scoreq)._
 
+_While NOMAD is useful for training quality metrics without MOS, we recommend using SCOREQ for more accurate quality predictions._
+
+## Description
 NOMAD is a perceptual audio similarity metric trained without using human quality scores e.g., MOS. 
 
 NOMAD embeddings can be used to:
@@ -7,7 +11,7 @@ NOMAD embeddings can be used to:
 * As a loss function to improve speech enhancement models
 
 ## Table of contents
-- [NOMAD: Non-Matching Audio Distance](#non-matching-audio-distance--nomad-)
+- [NOMAD: Non-Matching Audio Distance](#description)
   * [Installation](#installation)
   * [Using NOMAD similarity score](#using-nomad-similarity-score)
     + [Using NOMAD from the command line](#using-nomad-from-the-command-line)
