@@ -186,7 +186,10 @@ If you use NOMAD or the training corpus for your research, please cite our ICASS
   keywords={Degradation;Speech enhancement;Signal processing;Predictive models;Feature extraction;Acoustic measurements;Loss measurement;Perceptual measures of audio quality; objective and subjective quality assessment; speech enhancement},
   doi={10.1109/ICASSP48485.2024.10448028}}
 ``` 
+[![DOI](https://zenodo.org/badge/681227455.svg)](https://doi.org/10.5281/zenodo.14735522)
 
 The NOMAD code is licensed under MIT license.
-
 Copyright © 2023 Alessandro Ragano
+
+
+
